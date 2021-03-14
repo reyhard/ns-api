@@ -15,7 +15,7 @@ import pytz
 from pytz.tzinfo import StaticTzInfo
 
 # ns-api library version
-__version__ = '3.0.4'
+__version__ = '3.0.5'
 
 
 # set placeholder url params
@@ -598,6 +598,33 @@ class Trip(BaseObject):
         except KeyError:
             # Fall back to the planned platform
             self.arrival_platform_actual = self.arrival_platform_planned
+
+        try:
+            self.product_shortCategoryName = trip_dict['legs'][0]['product']['shortCategoryName']
+        except KeyError:
+            self.product_shortCategoryName = None
+
+
+        try:
+            if trip_dict['legs'][0]['messages'] == []:
+                self.disruptions_head = None
+                self.disruptions_text = None
+                self.disruptions_type = None
+            else:
+                try:
+                    self.disruptions_head = trip_dict['legs'][0]['messages'][0]['head']
+                except KeyError:
+                    self.disruptions_head = None
+                try:
+                    self.disruptions_text = trip_dict['legs'][0]['messages'][0]['text']
+                except KeyError:
+                    self.disruptions_text = None
+                try:
+                    self.disruptions_type = trip_dict['legs'][0]['messages'][0]['type']
+                except KeyError:
+                    self.disruptions_type = None
+        except KeyError:
+            print("error")
 
         self.trip_parts = []
         raw_parts = trip_dict['legs']
